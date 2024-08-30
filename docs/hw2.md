@@ -8,7 +8,7 @@ I also can make text *Italicized*
 > [!WARNING]
 > I JUST CREATED A WARNING
 
-'''java
+'''java 
 int lookAtThis = 0;
 for(int i = 0; i <= 5; i++>){
     System.out.println("I just made a code block")
@@ -26,7 +26,7 @@ for(int i = 0; i <= 5; i++>){
 - A
 - List
 
-###Things I've added
+### Things I've added
 1. Heading
 2. Bold/Italics
 3. Block quotes
@@ -35,8 +35,8 @@ for(int i = 0; i <= 5; i++>){
 6. Table
 7. These lists
 
-[Here is a really cool link, you should click it] (https://youtu.be/dQw4w9WgXcQ?si=XdZPPHl_5pQCq86A)
+[ Here is a really cool link, you should click it] (https://youtu.be/dQw4w9WgXcQ?si=XdZPPHl_5pQCq86A)
 
 anywho here is a picture of my parrot
-![Picture of my pet parrot] (https://github.com/msu-eele-fpga/labs-and-homework-colter107/docs/assets/Pearl.jpg)
+![ Picture of my pet parrot ] (https://github.com/msu-eele-fpga/labs-and-homework-colter107/docs/assets/Pearl.jpg)
 
