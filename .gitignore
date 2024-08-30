@@ -99,4 +99,10 @@ incremental_db/
 output_files/
 work/
 
+# Questa files
+vsim.wlf
+*.cr.mti
+work/
+
+
 

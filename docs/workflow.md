@@ -87,7 +87,7 @@ gitGraph:
    ```
      $ git pull
    ```
-   **Note:** It is a good habit to get into of issueing a git pull so that any changes made to the remote repository will be reflected in the local repository  This also means that you should get into the habit of pushing changes to your remote repository.
+   **Note:** It is a good habit to get into of issuing a git pull so that any changes made to the remote repository will be reflected in the local repository. This also means that you should get into the habit of pushing changes to your remote repository.
 
 2. **Create a new branch:**
    ```
@@ -127,7 +127,7 @@ remote repository:
    ```
    $ git tag -a lab-7-submission
    ```
-   **Note 1:** If it takes multiple submissions to get a successfully working lab demonstration, number the tag submissions, i.e. lab-7-submission1, lab-7-submission2, etc. and end with: lab-7-submission-final
+   **Note 1:** If it takes multiple submissions to get a successfully working lab demonstration, number the tag submissions, i.e. lab-7-submission2, lab-7-submission3, etc.
    **Note 2:** We're using an annotated tag (`-a`).
 
 
