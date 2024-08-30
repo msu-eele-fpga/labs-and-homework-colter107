@@ -40,5 +40,5 @@ for(int i = 0; i <= 5; i++>){
 
 anywho here is a picture of my parrot
 
-![ Picture of my pet parrot ](https://github.com/msu-eele-fpga/labs-and-homework-colter107/docs/assets/Pearl.jpg)
+![Picture of my pet parrot](https://github.com/msu-eele-fpga/labs-and-homework-colter107/blob/hw-2/docs/assets/Pearl.jpg)
 
