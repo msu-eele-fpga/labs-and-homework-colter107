@@ -108,7 +108,7 @@ begin
       report "all tests passed!";
     end if;
 
-    std.env.finish;
+    
 
   end process check_output;
 
