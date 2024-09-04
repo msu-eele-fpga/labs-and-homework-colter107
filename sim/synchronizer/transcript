@@ -1,0 +1,38 @@
+vsim work.synchronizer_tb
+# vsim work.synchronizer_tb 
+# Start time: 22:52:11 on Sep 03,2024
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading std.env(body)
+# Loading work.synchronizer_tb(testbench)
+# Loading work.synchronizer(synchronizer_arch)
+add wave  \
+sim:/synchronizer_tb/clk_tb \
+sim:/synchronizer_tb/async_tb \
+sim:/synchronizer_tb/sync_tb \
+sim:/synchronizer_tb/sync_expected
+# Compile of synchronizer_tb.vhd was successful.
+run
+# ** Note: all tests passed!
+#    Time: 100 ns  Iteration: 0  Instance: /synchronizer_tb
+# 1
+# Break in Process check_output at C:/Users/colte/Documents/College/Classes/SOC FPGAs/gitClassroom/sim/synchronizer/synchronizer_tb.vhd line 111
+vsim work.synchronizer_tb
+# End time: 22:54:19 on Sep 03,2024, Elapsed time: 0:02:08
+# Errors: 0, Warnings: 2
+# vsim work.synchronizer_tb 
+# Start time: 22:54:20 on Sep 03,2024
+# Loading std.standard
+# Loading std.textio(body)
+# Loading ieee.std_logic_1164(body)
+# Loading work.synchronizer_tb(testbench)
+# Loading work.synchronizer(synchronizer_arch)
+add wave  \
+sim:/synchronizer_tb/clk_tb \
+sim:/synchronizer_tb/async_tb \
+sim:/synchronizer_tb/sync_tb \
+sim:/synchronizer_tb/sync_expected
+run
+# ** Note: all tests passed!
+#    Time: 100 ns  Iteration: 0  Instance: /synchronizer_tb
