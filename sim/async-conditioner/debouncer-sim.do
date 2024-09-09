@@ -1,0 +1,1 @@
+vsim -voptargs=+acc -onfinish stop work.debouncer_tb

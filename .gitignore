@@ -98,6 +98,7 @@ db/
 incremental_db/
 output_files/
 work/
+quartus/**/simulation/
 
 # Questa files
 vsim.wlf
