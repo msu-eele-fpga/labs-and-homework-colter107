@@ -116,8 +116,8 @@ begin
     dispense_predicted := '1' when amount_tb = 15 else '0';
 
     -- Comparator - assert that DUV outputs and predictor outputs match
-    assert_eq(amount_predicted, amount_tb, "amount is as expected");
-    assert_eq(dispense_predicted, dispense_tb, "dispense is as expected");
+    assert_eq(amount_tb, amount_predicted, "amount is as expected");
+    assert_eq(dispense_tb, dispense_predicted, "dispense is as expected");
 
   end process response_checker;
 
