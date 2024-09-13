@@ -107,4 +107,5 @@ work/
 transcript
 
 
-
+# Vim swap files
+*.swp

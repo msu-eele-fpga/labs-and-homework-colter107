@@ -12,10 +12,10 @@ use work.assert_pkg.all;
 use work.print_pkg.all;
 use work.tb_pkg.all;
 
-entity vending_macine_tb is
-end entity vending_macine_tb;
+entity vending_machine_tb is
+end entity vending_machine_tb;
 
-architecture testbench of vending_macine_tb is
+architecture testbench of vending_machine_tb is
 
   signal clk_tb      : std_ulogic := '0';
   signal rst_tb      : std_ulogic := '0';
