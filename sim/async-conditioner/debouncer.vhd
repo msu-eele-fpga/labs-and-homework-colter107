@@ -25,12 +25,12 @@ architecture debouncer_arch of debouncer is
     begin
 	if(rst = '0') then 
         	if (busy = '1') then
-			if(rising_edge(clk)) then
-				if (iter < (HOLD_ITER - 2)) then
-					iter <= iter + 1;
-				else
-					iter <= 0;
-					busy <= '0';
+				if(rising_edge(clk)) then
+					if (iter < (HOLD_ITER - 2)) then
+						iter <= iter + 1;
+					else
+						iter <= 0;
+						busy <= '0';
 				end if;
 			end if;
 		else
