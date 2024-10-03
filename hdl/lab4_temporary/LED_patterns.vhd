@@ -60,13 +60,13 @@ architecture LED_patterns_arch of LED_patterns is
     signal current_state, next_state : state_type;
     
     --LED FSM outputs
-    signal led_fsm_out : std_ulogic_vector (7 downto 0);
+    signal led_fsm_out : std_ulogic_vector (6 downto 0);
     signal led_fsm_state : state_type;
-    signal pattern0_LEDS : unsigned(7 downto 0) := "00000000";
-    signal pattern1_LEDS : unsigned(7 downto 0) := "00000000";
-    signal pattern2_LEDS : unsigned(7 downto 0) := "00000000";
-    signal pattern3_LEDS : unsigned(7 downto 0) := "00000000";
-    signal pattern4_LEDS : unsigned(7 downto 0) := "00000000";
+    signal pattern0_LEDS : STD_ULOGIC_VECTOR(6 downto 0) := "00000000";
+    signal pattern1_LEDS : STD_ULOGIC_VECTOR(6 downto 0) := "00000000";
+    signal pattern2_LEDS : STD_ULOGIC_VECTOR(6 downto 0) := "00000000";
+    signal pattern3_LEDS : STD_ULOGIC_VECTOR(6 downto 0) := "00000000";
+    signal pattern4_LEDS : STD_ULOGIC_VECTOR(6 downto 0) := "00000000";
 
     --Timer for transition from switch in state to led pattern
     signal timer_flag_1sec : std_ulogic;
@@ -228,7 +228,7 @@ begin
         pattern0_out    => pattern0_LEDS
     );
 
-     --LED Pattern 1 generator
+   --LED Pattern 1 generator
    pattern1_gen : pattern1 
    port map(
        clk_in          => clk_pattern1,
@@ -289,7 +289,15 @@ begin
 
     output_logic : process (current_state)
     begin
-        led_fsm_state <= current_state;
+        case(current_state) is 
+            when(SWITCH_IN) =>
+                led_fsm_out <= switches;
+                --enable timer
+            when(S_PATTERN0) =>
+                led_fsm_out <= pattern0_LEDS;
+
+        end case;
+
     end process output_logic;
 
     control_decision : process(clk, rst)
