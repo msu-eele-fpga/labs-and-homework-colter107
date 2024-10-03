@@ -56,7 +56,7 @@ architecture LED_patterns_arch of LED_patterns is
 
     --State machine states
     type state_type is 
-        (SWITCH_IN, PATTERN0, PATTERN1, PATTERN2, PATTERN3, PATTERN4); 
+        (SWITCH_IN, S_PATTERN0, S_PATTERN1, S_PATTERN2, S_PATTERN3, S_PATTERN4); 
     signal current_state, next_state : state_type;
     
     --LED FSM outputs
@@ -99,7 +99,50 @@ architecture LED_patterns_arch of LED_patterns is
         );
     end component Clock_generation;
     
+   --LED Pattern 0 generator
+   component pattern0 is
+    port (
+        clk_in      : in std_ulogic;
+        rst         : in std_ulogic;
+        pattern0_out : out unsigned(6 downto 0)
+    );
+    end component pattern0;
 
+    --LED Pattern 1 generator
+    component pattern1 is
+        port (
+            clk_in      : in std_ulogic;
+            rst         : in std_ulogic;
+            pattern0_out : out unsigned(6 downto 0)
+        );
+    end component pattern1;
+
+    --LED Pattern 2 generator
+    component pattern2 is
+        port (
+            clk_in      : in std_ulogic;
+            rst         : in std_ulogic;
+            pattern0_out : out unsigned(6 downto 0)
+        );
+    end component pattern2;
+
+    --LED Pattern 3 generator
+    component pattern3 is
+        port (
+            clk_in      : in std_ulogic;
+            rst         : in std_ulogic;
+            pattern0_out : out unsigned(6 downto 0)
+        );
+    end component pattern3;
+
+    --LED Pattern 4 generator
+    component pattern4 is
+        port (
+            clk_in      : in std_ulogic;
+            rst         : in std_ulogic;
+            pattern0_out : out unsigned(6 downto 0)
+        );
+    end component pattern4;
 
 
 begin
@@ -152,7 +195,7 @@ begin
        clk_in => clk,
        rst => rst,
        half_period_cycles => half_period_double,
-       clk_out => clk_pattern0
+       clk_out => clk_pattern2
    );
 
    pattern3_clk : Clock_Generation
@@ -163,7 +206,7 @@ begin
        clk_in => clk,
        rst => rst,
        half_period_cycles => half_period_eighth,
-       clk_out => clk_pattern0
+       clk_out => clk_pattern3
    );
 
    pattern4_clk : Clock_Generation
@@ -177,12 +220,51 @@ begin
        clk_out => clk_pattern4
    );
 
-    
+    --LED Pattern 0 generator
+   pattern0_gen : pattern0 
+    port map(
+        clk_in          => clk_pattern0,
+        rst             => rst,
+        pattern0_out    => pattern0_LEDS
+    );
+
+     --LED Pattern 1 generator
+   pattern1_gen : pattern1 
+   port map(
+       clk_in          => clk_pattern1,
+       rst             => rst,
+       pattern0_out    => pattern1_LEDS
+   );
+
+    --LED Pattern 2 generator
+    pattern2_gen : pattern2 
+    port map(
+        clk_in          => clk_pattern2,
+        rst             => rst,
+        pattern0_out    => pattern2_LEDS
+    );
+
+     --LED Pattern 3 generator
+   pattern3_gen : pattern3 
+   port map(
+       clk_in          => clk_pattern3,
+       rst             => rst,
+       pattern0_out    => pattern3_LEDS
+   );
+
+    --LED Pattern 4 generator
+    pattern4_gen : pattern4 
+    port map(
+        clk_in          => clk_pattern4,
+        rst             => rst,
+        pattern0_out    => pattern4_LEDS
+    );
+
 
     state_memory : process (clk, rst)
     begin
         if (rst = '0') then
-            current_state <= PATTERN0;
+            current_state <= S_PATTERN0;
         elsif (rising_edge(Clk)) then
             current_state <= next_state;
         end if;
@@ -195,11 +277,11 @@ begin
             next_state <= SWITCH_IN;
         elsif(timer_flag_1sec = '1') then 
             case (switches) is 
-                when "0000" => next_state <= PATTERN0;
-                when "0001" => next_state <= PATTERN1;
-                when "0010" => next_state <= PATTERN2;
-                when "0011" => next_state <= PATTERN3;
-                when "0100" => next_state <= PATTERN4;
+                when "0000" => next_state <= S_PATTERN0;
+                when "0001" => next_state <= S_PATTERN1;
+                when "0010" => next_state <= S_PATTERN2;
+                when "0011" => next_state <= S_PATTERN3;
+                when "0100" => next_state <= S_PATTERN4;
                 when others => next_state <= SWITCH_IN;
             end case;        
         end if;
@@ -222,6 +304,8 @@ begin
             LED <= "00000000";
         end if;
     end process control_decision;
+
+    
 
 
 end architecture;
