@@ -20,7 +20,7 @@ begin
         if(rst = '1') then
             pattern2_unsigned <= (others => '0'); 
         else
-            if(pattern2_unsigned = "1111111") then
+            if(pattern2_unsigned = 127) then
                 pattern2_unsigned <= (others => '0');
             end if; 
             pattern2_unsigned <= pattern2_unsigned + 1; 

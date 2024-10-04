@@ -18,12 +18,12 @@ begin
     update_pattern : process(clk_in, rst)
     begin
         if(rst = '1') then
-            pattern1_unsigned <= (others => '0') + 3; 
+            pattern1_unsigned <= to_unsigned(3,7); 
         else
             pattern1_unsigned <= pattern1_unsigned sll 1;
-            if(pattern1_unsigned = "1000000") then
+            if(pattern1_unsigned = 64) then
                 pattern1_unsigned(0) <= '1';
-            elsif (pattern1_unsigned = "0000010") then
+            elsif (pattern1_unsigned = 2) then
                 pattern1_unsigned(0) <= '1';
             end if;  
         end if;

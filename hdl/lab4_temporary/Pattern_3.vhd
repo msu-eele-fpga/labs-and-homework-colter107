@@ -20,7 +20,7 @@ begin
         if(rst = '1') then
             pattern3_unsigned <= (others => '1'); 
         else
-            if(pattern3_unsigned = "0000000") then
+            if(pattern3_unsigned = 0) then
                 pattern3_unsigned <= (others => '1');
             end if; 
             pattern3_unsigned <= pattern3_unsigned - 1; 
