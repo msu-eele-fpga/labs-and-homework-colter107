@@ -57,6 +57,37 @@ begin
         rst_tb <= '1';
         wait_for_clock_edges(clk_tb, 10);
         rst_tb <= '0';
-        wait_for_clock_edges(clk_tb,500000000);
+        wait_for_clock_edges(clk_tb, 300);
+
+        switches_tb <= "0001";
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '1';
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '0';
+        wait_for_clock_edges(clk_tb, 300);
+
+        switches_tb <= "0010";
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '1';
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '0';
+        wait_for_clock_edges(clk_tb, 300);
+
+        switches_tb <= "0011";
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '1';
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '0';
+        wait_for_clock_edges(clk_tb, 300); 
+
+        switches_tb <= "0100";
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '1';
+        wait_for_clock_edges(clk_tb,10);
+        push_button_tb <= '0';
+        wait_for_clock_edges(clk_tb, 300);
+        
+        std.env.finish;
+
    end process stimuli_and_checker;
 end architecture;

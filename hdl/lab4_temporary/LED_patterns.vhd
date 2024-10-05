@@ -45,13 +45,15 @@ architecture LED_patterns_arch of LED_patterns is
 
     --Number of whole clock cycles in 1/8, 1/4, 1/2, and 2x clock period
     --Since we are only dealing with whole clock cycles, fractional bits are ignored and thus don't need to be updated
+    signal clk_cycles_sixteenth : unsigned(base_period_clk_cycles'length - 1 downto 0);
     signal clk_cycles_eighth : unsigned(base_period_clk_cycles'length - 1 downto 0);
     signal clk_cycles_fourth : unsigned(base_period_clk_cycles'length - 1 downto 0);
     signal clk_cycles_half : unsigned(base_period_clk_cycles'length - 1 downto 0);
     signal clk_cycles_double : unsigned(base_period_clk_cycles'length - 1 downto 0);
 
     --Number of clock cycles in one second (equal to the clock frequency) 
-    constant one_second : time := 1 sec;
+    constant one_second : time := 500 ns;
+    constant timer_clock_period : time := 20 ns;
     signal one_sec_en : boolean := false;
 
 
@@ -71,12 +73,13 @@ architecture LED_patterns_arch of LED_patterns is
 
     --Timer for transition from switch in state to led pattern
     signal timer_flag_1sec : boolean;
-
+    
     signal push_button_conditioned : STD_ULOGIC;
 
     
     constant half_period_length   	: natural := base_period_clk_cycles'length - 1;
-    signal half_period                  : unsigned(half_period_length downto 0);
+    signal half_period              : unsigned(half_period_length downto 0);
+    signal half_period_sixteenth    : unsigned(half_period_length downto 0);
     signal half_period_eighth 		: unsigned(half_period_length downto 0);
     signal half_period_fourth   	: unsigned(half_period_length downto 0);
     signal half_period_half     	: unsigned(half_period_length downto 0);
@@ -152,13 +155,13 @@ architecture LED_patterns_arch of LED_patterns is
     end component pattern3;
 
     --LED Pattern 4 generator
-    --component pattern4 is
-    --    port (
-    --        clk_in      : in std_ulogic;
-    --        rst         : in std_ulogic;
-    --        pattern4_out : out std_ulogic_vector(6 downto 0)
-    --    );
-    --end component pattern4;
+    component pattern4 is
+       port (
+            clk_in      : in std_ulogic;
+            rst         : in std_ulogic;
+            pattern4_out : out std_ulogic_vector(6 downto 0)
+        );
+    end component pattern4;
 
     component async_conditioner is
         port (
@@ -178,12 +181,14 @@ begin
 
     --Remove fractional component
     base_period_clk_cycles <= base_period_clk_cycles_full(clock_cycles_num_bits_total - 1 downto 4);
+    clk_cycles_sixteenth <= base_period_clk_cycles srl 4;
     clk_cycles_eighth <= base_period_clk_cycles srl 3;
     clk_cycles_fourth <= base_period_clk_cycles srl 2;
     clk_cycles_half <= base_period_clk_cycles srl 1;
     clk_cycles_double <= base_period_clk_cycles sll 1;
 
     half_period <= base_period_clk_cycles srl 1;
+    half_period_sixteenth <= clk_cycles_sixteenth srl 1;
     half_period_eighth <= clk_cycles_eighth srl 1;
     half_period_fourth <= clk_cycles_fourth srl 1;
     half_period_half <= clk_cycles_half srl 1;
@@ -250,13 +255,13 @@ begin
     port map(
        clk_in => clk,
        rst => rst,
-       half_period_cycles => half_period_half,
+       half_period_cycles => half_period_sixteenth,
        clk_out => clk_pattern4
    );
 
    switch_in_timer : timed_counter
     generic map(
-        clk_period => system_clock_period,
+        clk_period => timer_clock_period,
         count_time => one_second
     )
     port map (
@@ -299,12 +304,12 @@ begin
    );
 
     --LED Pattern 4 generator
-    --pattern4_gen : pattern4 
-    --port map(
-    --    clk_in          => clk_pattern4,
-    --    rst             => rst,
-    -- pattern4_out    => pattern4_LEDS
-    --);
+    pattern4_gen : pattern4 
+    port map(
+        clk_in          => clk_pattern4,
+        rst             => rst,
+        pattern4_out    => pattern4_LEDS
+    );
 
     pb_conditioner: async_conditioner
         port map(
@@ -318,27 +323,34 @@ begin
 
     state_memory : process (clk, rst)
     begin
-        if (rst = '0') then
+        if (rst = '1') then
             current_state <= S_PATTERN0;
         elsif (rising_edge(Clk)) then
             current_state <= next_state;
         end if;
     end process;
 
-    next_state_logic : process (current_state, push_button_conditioned)
+    next_state_logic : process (clk, rst)
     begin
-        if(push_button_conditioned = '1') then
-            next_state <= SWITCH_IN;
-        elsif(timer_flag_1sec) then 
-            case (switches) is 
-                when "0000" => next_state <= S_PATTERN0;
-                when "0001" => next_state <= S_PATTERN1;
-                when "0010" => next_state <= S_PATTERN2;
-                when "0011" => next_state <= S_PATTERN3;
-                when "0100" => next_state <= S_PATTERN4;
-                when others => next_state <= SWITCH_IN;
-            end case;        
+        if(rst = '0') then
+            if(push_button_conditioned = '1') then
+                next_state <= SWITCH_IN;
+            elsif(timer_flag_1sec) then 
+                case (switches) is 
+                    when "0000" => next_state <= S_PATTERN0;
+                    when "0001" => next_state <= S_PATTERN1;
+                    when "0010" => next_state <= S_PATTERN2;
+                    when "0011" => next_state <= S_PATTERN3;
+                    when "0100" => next_state <= S_PATTERN4;
+                    when others => next_state <= SWITCH_IN;
+                end case;
+            else
+                next_state <= current_state;        
+            end if;
+        else
+            next_state <= S_PATTERN0;
         end if;
+    
     end process;
 
     output_logic : process (clk,rst)
@@ -353,11 +365,15 @@ begin
                     one_sec_en <= false;
                 when(S_PATTERN1) =>
                     led_fsm_out(6 downto 0) <= pattern1_LEDS;
+                    one_sec_en <= false;
                 when(S_PATTERN2) =>
-                    led_fsm_out(6 downto 0) <= pattern1_LEDS;
+                    led_fsm_out(6 downto 0) <= pattern2_LEDS;
                     one_sec_en <= false;
                 when(S_PATTERN3) =>
-                    led_fsm_out(6 downto 0) <= pattern1_LEDS;
+                    led_fsm_out(6 downto 0) <= pattern3_LEDS;
+                    one_sec_en <= false;
+                when(S_PATTERN4) =>
+                    led_fsm_out(6 downto 0) <= pattern4_LEDS;
                     one_sec_en <= false;
                 when others =>
                     led_fsm_out(6 downto 0) <= "0101010";
@@ -374,9 +390,9 @@ begin
     begin
         if(rst = '0' ) then 
             if hps_led_control then
-                LED <= led_reg;
-            else
                 LED <= led_fsm_out;
+            else
+                LED <= led_reg;
             end if;
         else
             LED <= "00000000";

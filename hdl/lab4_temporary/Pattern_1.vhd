@@ -21,9 +21,9 @@ begin
             pattern1_unsigned <= to_unsigned(3,7); 
         else
             pattern1_unsigned <= pattern1_unsigned sll 1;
-            if(pattern1_unsigned = 64) then
+            if(pattern1_unsigned = "1100000") then
                 pattern1_unsigned(0) <= '1';
-            elsif (pattern1_unsigned = 2) then
+            elsif (pattern1_unsigned = "1000001") then
                 pattern1_unsigned(0) <= '1';
             end if;  
         end if;
