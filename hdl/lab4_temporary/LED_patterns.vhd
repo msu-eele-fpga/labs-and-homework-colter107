@@ -59,7 +59,7 @@ architecture LED_patterns_arch of LED_patterns is
     --State machine states
     type state_type is 
         (SWITCH_IN, S_PATTERN0, S_PATTERN1, S_PATTERN2, S_PATTERN3, S_PATTERN4); 
-    signal current_state, next_state : state_type;
+    signal previous_state, current_state, next_state : state_type;
     
     --LED FSM outputs
     signal led_fsm_out : std_ulogic_vector (7 downto 0);
@@ -360,8 +360,8 @@ begin
                         when "0010" => next_state <= S_PATTERN2;
                         when "0011" => next_state <= S_PATTERN3;
                         when "0100" => next_state <= S_PATTERN4;
-                        when others => next_state <= SWITCH_IN;
-                    end case;       
+                        when others => next_state <= previous_state;
+                    end case;      
                 end if;
             end if;
         else
@@ -381,18 +381,23 @@ begin
                     when(S_PATTERN0) =>
                         led_fsm_out(6 downto 0) <= pattern0_LEDS;
                         one_sec_en <= false;
+                        previous_state <= S_PATTERN0;
                     when(S_PATTERN1) =>
                         led_fsm_out(6 downto 0) <= pattern1_LEDS;
                         one_sec_en <= false;
+                        previous_state <= S_PATTERN1;
                     when(S_PATTERN2) =>
                         led_fsm_out(6 downto 0) <= pattern2_LEDS;
                         one_sec_en <= false;
+                        previous_state <= S_PATTERN2;
                     when(S_PATTERN3) =>
                         led_fsm_out(6 downto 0) <= pattern3_LEDS;
                         one_sec_en <= false;
+                        previous_state <= S_PATTERN3;
                     when(S_PATTERN4) =>
                         led_fsm_out(6 downto 0) <= pattern4_LEDS;
                         one_sec_en <= false;
+                        previous_state <= S_PATTERN4;
                     when others =>
                         led_fsm_out(6 downto 0) <= "0101010";
                         one_sec_en <= false;
@@ -401,6 +406,7 @@ begin
         else
             led_fsm_out(6 downto 0) <= "0000000";
             one_sec_en <= false;
+            previous_state <= S_PATTERN0;
         end if;
 
     end process output_logic;

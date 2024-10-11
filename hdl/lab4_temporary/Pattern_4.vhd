@@ -19,9 +19,9 @@ begin
     update_pattern : process(clk_in, rst)
     begin
         if(rst = '1') then
-            pattern4_unsigned <= "1111110"; 
+            pattern4_unsigned <= "1111111"; 
             pattern4_counter <= 0;
-            pattern4_out <= "1111110";
+            pattern4_out <= "1111111";
         else
             if(rising_edge(clk_in)) then
                 pattern4_unsigned(pattern4_counter) <= not (pattern4_unsigned(pattern4_counter));
