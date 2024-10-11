@@ -68,7 +68,6 @@ dkms.conf
 *.qar
 *.qarlog
 *.qws
-*.qpf
 *.rpt
 *.smsg
 *.sof
@@ -99,6 +98,7 @@ incremental_db/
 output_files/
 work/
 quartus/**/simulation/
+*.tcl~
 
 # Questa files
 vsim.wlf
