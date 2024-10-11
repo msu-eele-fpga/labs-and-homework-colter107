@@ -5,7 +5,7 @@ use ieee.math_real.all;
 
 entity LED_patterns is
     generic (
-        system_clock_period : time := 1 ms
+        system_clock_period : time := 20 ns
     );
     port (
         clk             : in std_ulogic;
@@ -52,8 +52,7 @@ architecture LED_patterns_arch of LED_patterns is
     signal clk_cycles_double : unsigned(base_period_clk_cycles'length - 1 downto 0);
 
     --Number of clock cycles in one second (equal to the clock frequency) 
-    constant one_second : time := 500 ns;
-    constant timer_clock_period : time := 20 ns;
+    constant one_second : time := 1 sec;
     signal one_sec_en : boolean := false;
 
 
@@ -172,6 +171,24 @@ architecture LED_patterns_arch of LED_patterns is
         );
     end component async_conditioner;
 
+    --signal tap keep signals
+    signal one_sec_en_bit : std_ulogic;
+    attribute keep : boolean;
+    attribute preserve : boolean;
+    attribute keep of current_state: signal is true;
+    attribute keep of led_fsm_out  : signal is true;
+    attribute keep of pattern0_LEDS: signal is true;
+    attribute keep of pattern1_LEDS: signal is true;
+    attribute keep of pattern2_LEDS: signal is true;
+    attribute keep of pattern3_LEDS: signal is true;
+    attribute keep of pattern4_LEDS: signal is true;
+    attribute keep of clk_pattern1 : signal is true;
+    attribute keep of timer_flag_1sec : signal is true;
+    attribute keep of push_button_conditioned : signal is true;
+    attribute preserve of one_sec_en_bit : signal is true;
+    
+    
+
 
 begin
 
@@ -261,7 +278,7 @@ begin
 
    switch_in_timer : timed_counter
     generic map(
-        clk_period => timer_clock_period,
+        clk_period => system_clock_period,
         count_time => one_second
     )
     port map (
@@ -313,7 +330,7 @@ begin
 
     pb_conditioner: async_conditioner
         port map(
-            clk     =>  clk,
+            clk     => clk,
             rst     => rst,
             async   => push_button,
             sync    => push_button_conditioned
@@ -333,19 +350,19 @@ begin
     next_state_logic : process (clk, rst)
     begin
         if(rst = '0') then
-            if(push_button_conditioned = '1') then
-                next_state <= SWITCH_IN;
-            elsif(timer_flag_1sec) then 
-                case (switches) is 
-                    when "0000" => next_state <= S_PATTERN0;
-                    when "0001" => next_state <= S_PATTERN1;
-                    when "0010" => next_state <= S_PATTERN2;
-                    when "0011" => next_state <= S_PATTERN3;
-                    when "0100" => next_state <= S_PATTERN4;
-                    when others => next_state <= SWITCH_IN;
-                end case;
-            else
-                next_state <= current_state;        
+            if(rising_edge(clk)) then
+                if(push_button_conditioned = '1') then
+                    next_state <= SWITCH_IN;
+                elsif(timer_flag_1sec) then 
+                    case (switches) is 
+                        when "0000" => next_state <= S_PATTERN0;
+                        when "0001" => next_state <= S_PATTERN1;
+                        when "0010" => next_state <= S_PATTERN2;
+                        when "0011" => next_state <= S_PATTERN3;
+                        when "0100" => next_state <= S_PATTERN4;
+                        when others => next_state <= SWITCH_IN;
+                    end case;       
+                end if;
             end if;
         else
             next_state <= S_PATTERN0;
@@ -356,29 +373,31 @@ begin
     output_logic : process (clk,rst)
     begin
         if(rst = '0') then
-            case(current_state) is 
-                when(SWITCH_IN) =>
-                    led_fsm_out(6 downto 0) <= "000" & switches;
-                    one_sec_en <= true;
-                when(S_PATTERN0) =>
-                    led_fsm_out(6 downto 0) <= pattern0_LEDS;
-                    one_sec_en <= false;
-                when(S_PATTERN1) =>
-                    led_fsm_out(6 downto 0) <= pattern1_LEDS;
-                    one_sec_en <= false;
-                when(S_PATTERN2) =>
-                    led_fsm_out(6 downto 0) <= pattern2_LEDS;
-                    one_sec_en <= false;
-                when(S_PATTERN3) =>
-                    led_fsm_out(6 downto 0) <= pattern3_LEDS;
-                    one_sec_en <= false;
-                when(S_PATTERN4) =>
-                    led_fsm_out(6 downto 0) <= pattern4_LEDS;
-                    one_sec_en <= false;
-                when others =>
-                    led_fsm_out(6 downto 0) <= "0101010";
-                    one_sec_en <= false;
-            end case;
+            if(rising_edge(clk)) then
+                case(current_state) is 
+                    when(SWITCH_IN) =>
+                        led_fsm_out(6 downto 0) <= "000" & switches;
+                        one_sec_en <= true;
+                    when(S_PATTERN0) =>
+                        led_fsm_out(6 downto 0) <= pattern0_LEDS;
+                        one_sec_en <= false;
+                    when(S_PATTERN1) =>
+                        led_fsm_out(6 downto 0) <= pattern1_LEDS;
+                        one_sec_en <= false;
+                    when(S_PATTERN2) =>
+                        led_fsm_out(6 downto 0) <= pattern2_LEDS;
+                        one_sec_en <= false;
+                    when(S_PATTERN3) =>
+                        led_fsm_out(6 downto 0) <= pattern3_LEDS;
+                        one_sec_en <= false;
+                    when(S_PATTERN4) =>
+                        led_fsm_out(6 downto 0) <= pattern4_LEDS;
+                        one_sec_en <= false;
+                    when others =>
+                        led_fsm_out(6 downto 0) <= "0101010";
+                        one_sec_en <= false;
+                end case;
+            end if;
         else
             led_fsm_out(6 downto 0) <= "0000000";
             one_sec_en <= false;
@@ -389,10 +408,12 @@ begin
     control_decision : process(clk, rst)
     begin
         if(rst = '0' ) then 
-            if hps_led_control then
-                LED <= led_fsm_out;
-            else
-                LED <= led_reg;
+            if(rising_edge(clk)) then
+                if hps_led_control then
+                    LED <= led_fsm_out;
+                else
+                    LED <= led_reg;
+                end if;
             end if;
         else
             LED <= "00000000";
@@ -402,15 +423,26 @@ begin
     update_LED7 : process(clk_base, rst)
     begin
         if(rst = '0') then
-            LED7 <= not LED7;
+            if(rising_edge(clk_base)) then
+                LED7 <= not LED7;
+            end if;
         else
             LED7 <= '0';
         end if;
-        led_fsm_out(7) <= led7;
+        if(rising_edge(clk_base))then
+            led_fsm_out(7) <= led7;
+        end if;
     end process update_LED7;
 
-    
-    
-
+    update_bool_logic : process(clk)
+    begin
+        if(rising_edge(clk)) then
+            if(one_sec_en) then
+                one_sec_en_bit <= '1';
+            else
+                one_sec_en_bit <= '0';
+            end if;
+        end if;
+    end process update_bool_logic;
 
 end architecture;

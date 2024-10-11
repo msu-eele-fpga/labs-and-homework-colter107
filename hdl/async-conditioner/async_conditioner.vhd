@@ -47,8 +47,8 @@ end component one_pulse;
 signal sync_dirty : std_ulogic;
 signal debounced_dirty : std_ulogic;
 
-signal CLK_PERIOD : time := 20 ns;
-signal DEBOUNCE_TIME : time := 50 ns;
+constant CLK_PERIOD : time := 20 ns;
+constant DEBOUNCE_TIME : time := 1 ms;
 
 begin
 

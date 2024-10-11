@@ -15,27 +15,32 @@ entity debouncer is
 end entity debouncer;
 
 architecture debouncer_arch of debouncer is
-    signal hold : std_ulogic := '0';
-    signal busy: std_ulogic := '0';
-    signal iter : integer range 0 to 10000 := 0;
-    constant HOLD_ITER : integer range 0 to 10000 := debounce_time / clk_period;
-    begin
-    
-    debounce :process (clk, rst)
-    begin
+   signal hold : std_ulogic := '0';
+   signal busy: std_ulogic := '0';
+   signal iter : integer range 0 to 10000000 := 0;
+   constant HOLD_ITER : integer range 0 to 10000000 := debounce_time / clk_period;
+   begin
+   
+   debounce :process (clk, rst)
+	begin
 	if(rst = '0') then 
-        	if (busy = '1') then
-				if(rising_edge(clk)) then
-					if (iter < (HOLD_ITER - 2)) then
-						iter <= iter + 1;
-					else
-						iter <= 0;
-						busy <= '0';
+		if(rising_edge(clk)) then
+			if (busy = '1') then
+				if (iter < (HOLD_ITER - 2)) then
+					iter <= iter + 1;
+					busy <= '1';
+					hold <= hold;
+					debounced <= hold;
+				else
+					iter <= 0;
+					busy <= '0';
+					hold <= hold;
+					debounced <= hold;
 				end if;
-			end if;
-		else
-			if(rising_edge(clk)) then
+			
+			else
 				if (not (hold = input)) then
+					iter <= 0;
 					hold <= input;
 					debounced <= input;
 					busy <= '1';

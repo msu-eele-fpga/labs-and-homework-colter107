@@ -20,13 +20,18 @@ begin
     begin
         if(rst = '1') then
             pattern4_unsigned <= "1111110"; 
+            pattern4_counter <= 0;
+            pattern4_out <= "1111110";
         else
-            pattern4_unsigned(pattern4_counter) <= not (pattern4_unsigned(pattern4_counter));
-            pattern4_counter <= pattern4_counter + 1;
-            if (pattern4_counter = 6) then
-                pattern4_counter <= 0;
+            if(rising_edge(clk_in)) then
+                pattern4_unsigned(pattern4_counter) <= not (pattern4_unsigned(pattern4_counter));
+                pattern4_counter <= pattern4_counter + 1;
+                if (pattern4_counter = 6) then
+                    pattern4_counter <= 0;
+                end if;
+                pattern4_out <= std_ulogic_vector(pattern4_unsigned);
             end if;
         end if;
-        pattern4_out <= std_ulogic_vector(pattern4_unsigned);
+        
     end process update_pattern;
 end architecture pattern1_arch;

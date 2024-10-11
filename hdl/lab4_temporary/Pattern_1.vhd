@@ -18,15 +18,18 @@ begin
     update_pattern : process(clk_in, rst)
     begin
         if(rst = '1') then
-            pattern1_unsigned <= to_unsigned(3,7); 
+            pattern1_out <= "0000011"; 
+            pattern1_unsigned <= "0000011";
         else
-            pattern1_unsigned <= pattern1_unsigned sll 1;
-            if(pattern1_unsigned = "1100000") then
-                pattern1_unsigned(0) <= '1';
-            elsif (pattern1_unsigned = "1000001") then
-                pattern1_unsigned(0) <= '1';
-            end if;  
+            if(rising_edge(clk_in))then
+                pattern1_unsigned <= pattern1_unsigned sll 1;
+                if(pattern1_unsigned = "1100000") then
+                    pattern1_unsigned(0) <= '1';
+                elsif (pattern1_unsigned = "1000001") then
+                    pattern1_unsigned(0) <= '1';
+                end if;
+                pattern1_out <= std_ulogic_vector(pattern1_unsigned); 
+            end if;
         end if;
-        pattern1_out <= std_ulogic_vector(pattern1_unsigned);
     end process update_pattern;
 end architecture pattern1_arch;

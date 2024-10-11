@@ -18,13 +18,16 @@ begin
     update_pattern : process(clk_in, rst)
     begin
         if(rst = '1') then
-            pattern2_unsigned <= (others => '0'); 
+            pattern2_out <= "0000000"; 
+            pattern2_unsigned <= "0000000";
         else
-            if(pattern2_unsigned = 127) then
-                pattern2_unsigned <= (others => '0');
-            end if; 
-            pattern2_unsigned <= pattern2_unsigned + 1; 
+            if(rising_edge(clk_in))then
+                if(pattern2_unsigned = 127) then
+                    pattern2_unsigned <= (others => '0');
+                end if; 
+                pattern2_unsigned <= pattern2_unsigned + 1;
+                pattern2_out <= std_ulogic_vector(pattern2_unsigned);
+            end if;
         end if;
-        pattern2_out <= std_ulogic_vector(pattern2_unsigned);
     end process update_pattern;
 end architecture pattern2_arch;

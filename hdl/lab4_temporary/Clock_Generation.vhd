@@ -17,21 +17,26 @@ end entity Clock_generation;
 
 architecture Clock_gen_arch of Clock_Generation is
 signal counter : unsigned(half_period_width downto 0) := (others => '0');
-signal clk : std_ulogic;
+signal clk : std_ulogic := '0';
 begin
    clock_gen : process(clk_in,rst)
    begin
         if(rst = '1') then
-            clk <= '0';
+            clk_out <= '0';
             counter <= (others => '0');
         else
-            counter <= counter + 1;
-            if(counter = half_period_cycles - 1) then
-                clk <= not clk;
-                counter <= (others => '0');
+            if(rising_edge(clk_in))then
+                if(counter = half_period_cycles) then
+                    clk <= not clk;
+                    counter <= (others => '0');
+                else
+                    counter <= counter + 1;
+                    clk <= clk;
+                end if;
+                clk_out <= clk;
             end if;
         end if;
-	clk_out <= clk;
+	
    end process clock_gen;
 
 end architecture;

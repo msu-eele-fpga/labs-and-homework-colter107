@@ -15,7 +15,7 @@ end entity timed_counter;
 
 architecture counter_arch of timed_counter is
 	constant COUNTER_LIMIT : integer := count_time / clk_period;
-	signal count_iter : integer range 0 to 100000 := 0;
+	signal count_iter : integer range 0 to 1000000000 := 0;
 
 	begin
 
