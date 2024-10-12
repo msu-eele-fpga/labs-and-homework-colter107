@@ -174,7 +174,7 @@ architecture LED_patterns_arch of LED_patterns is
     --signal tap keep signals
     signal one_sec_en_bit : std_ulogic;
     attribute keep : boolean;
-    attribute preserve : boolean;
+	 attribute keep of push_button_conditioned: signal is true;
     attribute keep of current_state: signal is true;
     attribute keep of led_fsm_out  : signal is true;
     attribute keep of pattern0_LEDS: signal is true;
@@ -182,13 +182,7 @@ architecture LED_patterns_arch of LED_patterns is
     attribute keep of pattern2_LEDS: signal is true;
     attribute keep of pattern3_LEDS: signal is true;
     attribute keep of pattern4_LEDS: signal is true;
-    attribute keep of clk_pattern1 : signal is true;
-    attribute keep of timer_flag_1sec : signal is true;
-    attribute keep of push_button_conditioned : signal is true;
-    attribute preserve of one_sec_en_bit : signal is true;
-    
-    
-
+    attribute keep of clk_pattern4 : signal is true;
 
 begin
 
