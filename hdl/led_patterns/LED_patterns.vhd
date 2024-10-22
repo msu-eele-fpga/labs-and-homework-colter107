@@ -13,7 +13,7 @@ entity LED_patterns is
         push_button     : in std_ulogic;
         switches        : in std_ulogic_vector(3 downto 0);
         hps_led_control : in boolean;
-        base_period     : in unsigned(7 downto 0);
+        base_period     : in unsigned(7 downto 0) := "00010000";
         led_reg         : in std_ulogic_vector(7 downto 0);
         led             : out std_ulogic_vector(7 downto 0) 
     );
