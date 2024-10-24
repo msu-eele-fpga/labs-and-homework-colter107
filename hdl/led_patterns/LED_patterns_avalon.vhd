@@ -48,9 +48,9 @@ begin
     begin
         if(rising_edge(clk) and avs_read = '1') then
             case avs_address is 
-                when "00"   => avs_readdata <= SPACER_8BIT & led_reg;
+                when "00"   => avs_readdata <= SPACER_1BIT & hps_led_control_bit;
                 when "01"   => avs_readdata <= SPACER_8BIT & std_logic_vector(base_period_avalon);
-                when "10"   => avs_readdata <= SPACER_1BIT & hps_led_control_bit;
+                when "10"   => avs_readdata <= SPACER_8BIT & led_reg;
                 when others => avs_readdata <= (others => '0');
             end case;
         end if;
@@ -64,9 +64,13 @@ begin
             led_reg <= (others => '0');
         elsif(rising_edge(clk) and avs_write = '1') then
             case avs_address is 
-                when "00"   => led_reg      <= avs_writedata(7 downto 0);
+                when "00"   =>  if(avs_writedata(0) = '1') then
+                                    hps_led_control <= true;
+                                else
+                                    hps_led_control <= false;
+                                end if;
                 when "01"   => base_period_avalon  <= unsigned(avs_writedata(7 downto 0));
-                when "10"   => hps_led_control      <= avs_writedata(0);
+                when "10"   => led_reg      <= avs_writedata(7 downto 0);
                 when others => null;
             end case;
         end if;
@@ -74,6 +78,7 @@ begin
 
     hps_control_to_bit : process(clk)
     begin
+		 
         if(rising_edge(clk)) then
             if(hps_led_control) then
                 hps_led_control_bit <= '1';

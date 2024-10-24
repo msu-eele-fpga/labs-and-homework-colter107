@@ -410,9 +410,9 @@ begin
         if(rst = '0' ) then 
             if(rising_edge(clk)) then
                 if hps_led_control then
-                    LED <= led_fsm_out;
-                else
                     LED <= led_reg;
+                else
+                    LED <= led_fsm_out;
                 end if;
             end if;
         else
