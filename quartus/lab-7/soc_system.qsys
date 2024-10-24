@@ -17,6 +17,14 @@
          type = "int";
       }
    }
+   element IP_Core_0.avalon_slave_0
+   {
+      datum baseAddress
+      {
+         value = "0";
+         type = "String";
+      }
+   }
    element fpga_clk
    {
       datum _sortIndex
@@ -36,6 +44,14 @@
       {
          value = "1";
          type = "boolean";
+      }
+   }
+   element jtag_mm1
+   {
+      datum _sortIndex
+      {
+         value = "3";
+         type = "int";
       }
    }
    element soc_system
@@ -308,7 +324,7 @@
  <parameter name="hideFromIPCatalog" value="false" />
  <parameter name="lockedInterfaceDefinition" value="" />
  <parameter name="maxAdditionalLatency" value="1" />
- <parameter name="projectName" value="lab6.qpf" />
+ <parameter name="projectName" value="lab7.qpf" />
  <parameter name="sopcBorderPoints" value="false" />
  <parameter name="systemHash" value="0" />
  <parameter name="testBenchDutName" value="" />
@@ -866,6 +882,20 @@
   <parameter name="usb_mp_clk_div" value="0" />
   <parameter name="use_default_mpu_clk" value="true" />
  </module>
+ <module
+   name="jtag_mm1"
+   kind="altera_jtag_avalon_master"
+   version="23.1"
+   enabled="1">
+  <parameter name="AUTO_DEVICE" value="5CSEBA6U23I7" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Cyclone V" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="7" />
+  <parameter name="COMPONENT_CLOCK" value="0" />
+  <parameter name="FAST_VER" value="0" />
+  <parameter name="FIFO_DEPTHS" value="2" />
+  <parameter name="PLI_PORT" value="50000" />
+  <parameter name="USE_PLI" value="0" />
+ </module>
  <connection
    kind="avalon"
    version="23.1"
@@ -876,6 +906,16 @@
   <parameter name="defaultConnection" value="false" />
  </connection>
  <connection
+   kind="avalon"
+   version="23.1"
+   start="jtag_mm1.master"
+   end="IP_Core_0.avalon_slave_0">
+  <parameter name="arbitrationPriority" value="1" />
+  <parameter name="baseAddress" value="0x0000" />
+  <parameter name="defaultConnection" value="false" />
+ </connection>
+ <connection kind="clock" version="23.1" start="fpga_clk.clk" end="jtag_mm1.clk" />
+ <connection
    kind="clock"
    version="23.1"
    start="fpga_clk.clk"
@@ -885,6 +925,11 @@
    version="23.1"
    start="fpga_clk.clk"
    end="hps.h2f_lw_axi_clock" />
+ <connection
+   kind="reset"
+   version="23.1"
+   start="fpga_clk.clk_reset"
+   end="jtag_mm1.clk_reset" />
  <connection
    kind="reset"
    version="23.1"
