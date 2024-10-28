@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <library>
+<<<<<<< HEAD
     <path path="../hdl/**/*"/>
+=======
+    <path path="../../hdl/**/*"/>
+>>>>>>> 44297b9 (Fixed Lab 6 file issues, moved HDL for lab 6)
 </library>
