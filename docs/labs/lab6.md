@@ -1,5 +1,6 @@
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 # Lab 6: Creating a Custom Component in Platform Designer
 
@@ -17,6 +18,8 @@ The purpose of this lab was to create a custom component to control our hardware
 
 0000 1010b = 0x0Ah
 =======
+=======
+>>>>>>> 48acc7e (Final submission for lab 6.)
 # Lab 6: Creating a Custom Component in Platform Designer 
 
 ## Overview
@@ -58,5 +61,8 @@ In platform designer,the memory-mapped interface is connected to the lightweight
 
 0x0
 
+<<<<<<< HEAD
+>>>>>>> 48acc7e (Final submission for lab 6.)
+=======
 >>>>>>> 48acc7e (Final submission for lab 6.)
 
