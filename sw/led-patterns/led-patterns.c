@@ -4,6 +4,7 @@
 #include <stdbool.h>
 //#include <sys/mman.h> //for map
 #include <fcntl.h> //for file open flags
+#include <getopt.h>
 //#include <unistd.h> //for getting the page size
 
 void usage()
@@ -23,7 +24,8 @@ int main(int argc, char **argv)
     bool patternMode;
     bool fileMode;
 
-    while((option = getopt(argc,argv,"hvpf")) != 1){
+    option = getopt(argc,argv,"hvpf");
+    while(option != -1){
         switch(option){
             case 'h':
                 usage();
@@ -45,6 +47,7 @@ int main(int argc, char **argv)
                 printf("Unknown argument %c\n", optopt);
                 break;
         }
+        option = getopt(argc,argv,"hvpf");
     }
     
     
