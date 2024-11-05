@@ -9,12 +9,24 @@
 
 void usage()
 {
-    fprintf(stderr, "devmem ADDRESS [VALUE]\n");
-    fprintf(stderr, "devmem can be used to read/write to physical memory viea the /dev/mem device.\n");
-    fprintf(stderr, "devmem will only read/write 32-bit values \n\n");
-    fprintf(stderr, "Arguments:\n");
-    fprintf(stderr, "   ADDRESS The address to read/write to/from\n");
-    fprintf(stderr, "   VALUE The optional value to write to ADDRESS; if not given, a read will be performed\n");
+    fprintf(stderr, "usage: led-patterns [-h] [-v] [-p pattern1, time1, pattern2, time2 ...] [-f filename]\n");
+    fprintf(stderr, "led-patterns can be used to write patterns to the DE-10 Nano's LEDs using software.\n\n");
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "-h                                     show this help message and exit \n");
+    fprintf(stderr, "-v                                     verbose: print LED pattern displayed as a binary string,\n");
+    fprintf(stderr, "                                       as well as how long each pattern is displayed.\n");
+    fprintf(stderr, "                                       IE: LED pattern = 11110000 Display time = 500ms\n");
+    fprintf(stderr, "-f [filename]                          file mode: reads from text file of given filename and writes the \n");
+    fprintf(stderr, "                                       corresponding patterns. Patterns and time will be given as shown:\n");
+    fprintf(stderr, "                                           <pattern1> <time1> \n");
+    fprintf(stderr, "                                           <pattern2> <time2>\n");
+    fprintf(stderr, "                                       where pattern is a hexadecimal value and time is an unsigned int in ms. \n");
+    fprintf(stderr, "-p [pattern1, time1, pattern2 ...]     pattern mode: display each pattern for its respective time, \n");
+    fprintf(stderr, "                                       where pattern is a hexadecimal value and time is an unsigned int in ms. \n");
+    fprintf(stderr, "                                       loop until exit command Ctrl-C is entered. \n");
+    fprintf(stderr, "                                       if odd number of arguments, print error message and exit. \n");
+    fprintf(stderr, "                                       MUST be enetered as last argument.\n");
+    fprintf(stderr, "\n");
 }
 
 int main(int argc, char **argv)
@@ -24,7 +36,7 @@ int main(int argc, char **argv)
     bool patternMode;
     bool fileMode;
 
-    option = getopt(argc,argv,"hvpf");
+    option = getopt(argc,argv,"hvpf:");
     while(option != -1){
         switch(option){
             case 'h':
