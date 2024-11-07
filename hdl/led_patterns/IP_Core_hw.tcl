@@ -37,21 +37,21 @@ set_module_property REPORT_HIERARCHY false
 # 
 add_fileset QUARTUS_SYNTH QUARTUS_SYNTH "" ""
 set_fileset_property QUARTUS_SYNTH TOP_LEVEL led_patterns_avalon
-set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS false
+set_fileset_property QUARTUS_SYNTH ENABLE_RELATIVE_INCLUDE_PATHS true
 set_fileset_property QUARTUS_SYNTH ENABLE_FILE_OVERWRITE_MODE false
-add_fileset_file LED_patterns_avalon.vhd VHDL PATH ../../hdl/led_patterns/LED_patterns_avalon.vhd TOP_LEVEL_FILE
-add_fileset_file Clock_Generation.vhd VHDL PATH ../../hdl/led_patterns/Clock_Generation.vhd
-add_fileset_file LED_patterns.vhd VHDL PATH ../../hdl/led_patterns/LED_patterns.vhd
-add_fileset_file Pattern_0.vhd VHDL PATH ../../hdl/led_patterns/Pattern_0.vhd
-add_fileset_file Pattern_1.vhd VHDL PATH ../../hdl/led_patterns/Pattern_1.vhd
-add_fileset_file Pattern_2.vhd VHDL PATH ../../hdl/led_patterns/Pattern_2.vhd
-add_fileset_file Pattern_3.vhd VHDL PATH ../../hdl/led_patterns/Pattern_3.vhd
-add_fileset_file Pattern_4.vhd VHDL PATH ../../hdl/led_patterns/Pattern_4.vhd
-add_fileset_file async_conditioner.vhd VHDL PATH ../../hdl/async-conditioner/async_conditioner.vhd
-add_fileset_file debouncer.vhd VHDL PATH ../../hdl/async-conditioner/debouncer.vhd
-add_fileset_file one_pulse.vhd VHDL PATH ../../hdl/async-conditioner/one_pulse.vhd
-add_fileset_file synchronizer.vhd VHDL PATH ../../hdl/async-conditioner/synchronizer.vhd
-add_fileset_file timed_counter.vhd VHDL PATH ../../hdl/timed-counter/timed_counter.vhd
+add_fileset_file LED_patterns_avalon.vhd VHDL PATH LED_patterns_avalon.vhd TOP_LEVEL_FILE
+add_fileset_file Clock_Generation.vhd VHDL PATH Clock_Generation.vhd
+add_fileset_file LED_patterns.vhd VHDL PATH LED_patterns.vhd
+add_fileset_file Pattern_0.vhd VHDL PATH Pattern_0.vhd
+add_fileset_file Pattern_1.vhd VHDL PATH Pattern_1.vhd
+add_fileset_file Pattern_2.vhd VHDL PATH Pattern_2.vhd
+add_fileset_file Pattern_3.vhd VHDL PATH Pattern_3.vhd
+add_fileset_file Pattern_4.vhd VHDL PATH Pattern_4.vhd
+add_fileset_file async_conditioner.vhd VHDL PATH ../async-conditioner/async_conditioner.vhd
+add_fileset_file debouncer.vhd VHDL PATH ../async-conditioner/debouncer.vhd
+add_fileset_file one_pulse.vhd VHDL PATH ../async-conditioner/one_pulse.vhd
+add_fileset_file synchronizer.vhd VHDL PATH ../async-conditioner/synchronizer.vhd
+add_fileset_file timed_counter.vhd VHDL PATH ../timed-counter/timed_counter.vhd
 
 
 # 
