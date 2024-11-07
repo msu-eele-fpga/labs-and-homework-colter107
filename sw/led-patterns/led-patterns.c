@@ -42,7 +42,7 @@ int devmem_read (int r_to_read) {
     //Open the /dev/mem file, which is an image of the main system memory.
     //Using synchronous write operations (O_SYNC) to ensure that the value
     //is fully written to the underlying hardware before the write call returns
-    int fd = open("/dev/mem", O_RDWR | O_SYNC);
+    int fd = open("../../dev/mem", O_RDWR | O_SYNC);
     if (fd == -1)
     {
         fprintf(stderr, "failed to open /dev/mem. \n");
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
     bool verbose;
     bool patternMode;
     bool fileMode;
-
+    int patternStartIndex = 1;
 
     if (argc == 1)
     {
@@ -106,9 +106,11 @@ int main(int argc, char **argv)
         switch(option){
             case 'h':
                 usage();
+                patternStartIndex++;
                 break;
             case 'v':
                 verbose = true;
+                patternStartIndex++;
                 break;
             case 'p':
                 patternMode = true;
@@ -119,7 +121,7 @@ int main(int argc, char **argv)
                 break;
             case '?':
                 printf("Unknown argument %c\n", optopt);
-                break;
+                return 1;
         }
         option = getopt(argc,argv,"hvpf");
         if(fileMode && patternMode){
@@ -127,6 +129,8 @@ int main(int argc, char **argv)
             printf("Exiting program... \n");
             return 1;
         }
+
+
     }
 
     printf("%d\n",devmem_read('0'));
