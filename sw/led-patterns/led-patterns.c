@@ -35,76 +35,10 @@ void usage()
     fprintf(stderr, "\n");
 }
 
-void devmem_rw(char reg, bool is_write);
-
-
-    const uint32_t ADDRESS = strtoul(0xff200000 + reg, NULL, 0);
-
-    //Open the /dev/mem file, which is an image of the main system memory.
-    //Using synchronous write operations (O_SYNC) to ensure that the value
-    //is fully written to the underlying hardware before the write call returns
-    int fd = open("/dev/mem", O_RDWR | O_SYNC);
-    if (fd == -1)
-    {
-        fprintf(stderr, "failed to open /dev/mem. \n");
-        return 1;
-    }
-    
-    //mmap needs to map memory at page boundaries (address we're mapping must be aligned to a page).
-    //~(PAGE_SIZE -1) bitmask returns the closest page-alligned address that contains ADDRESS in the page.
-    //For 4096 byte page, (PAGE_SIZE -1 ) = 0xFFF; after flipping and converting to 32-bit we have a mask of -xFFFF_F000.
-    //AND'ing with this mask will make the 3 least significant nibbles of ADDRESS 0.
-    //This ensures the returned address is a multple of page size. Because 4096 - 0x1000, anything with three zeros for
-    //the least significant nibbles must be a multiple.
-
-    uint32_t page_aligned_addr = ADDRESS & ~(PAGE_SIZE - 1);
-    printf("memroy addresses:\n");
-    printf("-------------------------------------------------------------\n");
-    printf("page aligned address = 0x%x\n", page_aligned_addr);
-
-    // Map a page of physical memory into virtual memory. 
-    // mor infos at mmap man page: https://www.man7.org/linux/man-pages/man2/mmap.2.html
-    uint32_t *page_virtual_addr = (uint32_t *)mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, page_aligned_addr);
-    if(page_virtual_addr == MAP_FAILED)
-    {
-        fprintf(stderr, "failed to map memory. \n");
-        return 1;
-    }
-    printf("page_virtual_addr = %p\n", page_virtual_addr);
-
-    //The address we want to access is probably not page-aligned, so we need to find how far away from the page boundary it is.
-    //Using this offset, we can compute the virtual addres corresponding to the physical targed address (ADDRESS)
-    uint32_t offset_in_page =  ADDRESS & (PAGE_SIZE -1);
-    printf("offset in page = 0x%x\n", offset_in_page);
-
-    //Compute virtual address corrsponding to ADDRESS.
-    //Because virtual addresses are both uint32_t (integer) pointers, the pointer addition multiplies the address by the number
-    //of bytes needed to store a uint32_t. This is not what we want. So, we divide by this size (4 bytes) to make it return the
-    //right address. 
-
-    //We use volatile because the target virtual address could change outside the program.
-    //Volatile tells the compiler to not optimize accesses to this address.
-    volatile uint32_t *target_virtual_addr = page_virtual_addr + offset_in_page/sizeof(uint32_t*);
-    printf("target_virtual_addr = %p\n", target_virtual_addr);
-    printf("-------------------------------------------------------------\n");
-
-    if(is_write)
-    {
-        const uint32_t VALUE = strtoul(argv[2], NULL, 0);
-        *target_virtual_addr = VALUE;
-    }
-    else
-    {
-        printf("\nvalue at 0x%x = 0x%x\n", ADDRESS, *target_virtual_addr);
-    }
-
-    return 0;
-
-int devmem_read (int r_to_read) {
-
+int devmem_read(char reg){
     const size_t PAGE_SIZE = sysconf(_SC_PAGE_SIZE);
-    const char to_read = (0xff200000) + (4 * r_to_read);
-    const uint32_t ADDRESS = to_read;
+    uint32_t reg_offset = 4*reg;
+    const uint32_t ADDRESS = 0xff200000 + reg_offset;
 
     //Open the /dev/mem file, which is an image of the main system memory.
     //Using synchronous write operations (O_SYNC) to ensure that the value
@@ -147,9 +81,61 @@ int devmem_read (int r_to_read) {
     //Volatile tells the compiler to not optimize accesses to this address.
     volatile uint32_t *target_virtual_addr = page_virtual_addr + offset_in_page/sizeof(uint32_t*);
 
-    return *target_virtual_addr;  
-}
+    return(*target_virtual_addr);
+}   
+
+int devmem_write(char reg, uint32_t write_value){
+    const size_t PAGE_SIZE = sysconf(_SC_PAGE_SIZE);
+    uint32_t reg_offset = 4*reg;
+    const uint32_t ADDRESS = 0xff200000 + reg_offset;
+
+    //Open the /dev/mem file, which is an image of the main system memory.
+    //Using synchronous write operations (O_SYNC) to ensure that the value
+    //is fully written to the underlying hardware before the write call returns
+    int fd = open("../../dev/mem", O_RDWR | O_SYNC);
+    if (fd == -1)
+    {
+        fprintf(stderr, "failed to open /dev/mem. \n");
+        return 1;
+    }
     
+    //mmap needs to map memory at page boundaries (address we're mapping must be aligned to a page).
+    //~(PAGE_SIZE -1) bitmask returns the closest page-alligned address that contains ADDRESS in the page.
+    //For 4096 byte page, (PAGE_SIZE -1 ) = 0xFFF; after flipping and converting to 32-bit we have a mask of -xFFFF_F000.
+    //AND'ing with this mask will make the 3 least significant nibbles of ADDRESS 0.
+    //This ensures the returned address is a multple of page size. Because 4096 - 0x1000, anything with three zeros for
+    //the least significant nibbles must be a multiple.
+
+    uint32_t page_aligned_addr = ADDRESS & ~(PAGE_SIZE - 1);
+
+    // Map a page of physical memory into virtual memory. 
+    // mor infos at mmap man page: https://www.man7.org/linux/man-pages/man2/mmap.2.html
+    uint32_t *page_virtual_addr = (uint32_t *)mmap(NULL, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd, page_aligned_addr);
+    if(page_virtual_addr == MAP_FAILED)
+    {
+        fprintf(stderr, "failed to map memory. \n");
+        return 1;
+    }
+
+
+    //The address we want to access is probably not page-aligned, so we need to find how far away from the page boundary it is.
+    //Using this offset, we can compute the virtual addres corresponding to the physical targed address (ADDRESS)
+    uint32_t offset_in_page =  ADDRESS & (PAGE_SIZE -1);
+
+
+    //Compute virtual address corrsponding to ADDRESS.
+    //Because virtual addresses are both uint32_t (integer) pointers, the pointer addition multiplies the address by the number
+    //of bytes needed to store a uint32_t. This is not what we want. So, we divide by this size (4 bytes) to make it return the
+    //right address. 
+
+    //We use volatile because the target virtual address could change outside the program.
+    //Volatile tells the compiler to not optimize accesses to this address.
+    volatile uint32_t *target_virtual_addr = page_virtual_addr + offset_in_page/sizeof(uint32_t*);
+
+    const uint32_t VALUE = (uint32_t)write_value;
+    *target_virtual_addr = VALUE;
+    return 0;
+}
 
 int main(int argc, char **argv)
 {   
@@ -158,6 +144,8 @@ int main(int argc, char **argv)
     bool patternMode;
     bool fileMode;
     int patternStartIndex = 1;
+    int* patterns;
+    int* times;
 
     if (argc == 1)
     {
@@ -196,10 +184,9 @@ int main(int argc, char **argv)
             printf("Exiting program... \n");
             return 1;
         }
+        
 
 
     }
-
-    devmem_rw(0,false);
 
 }
