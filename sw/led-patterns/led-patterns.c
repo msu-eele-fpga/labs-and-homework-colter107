@@ -16,20 +16,22 @@ void usage()
     fprintf(stderr, "-v                                     verbose: print LED pattern displayed as a\n");
     fprintf(stderr, "                                       binary string, as well as how long each \n");
     fprintf(stderr, "                                       pattern is displayed\n");
-    fprintf(stderr, "                                       IE: LED pattern = 11110000 Display time = 500ms\n");
+    fprintf(stderr, "                                       IE: LED pattern = 11110000\n");
+    fprintf(stderr, "                                       Time = 500ms\n");
     fprintf(stderr, "-f [filename]                          file mode: reads from text file of given \n");
     fprintf(stderr, "                                       filename and writes the corresponding patterns.\n");
     fprintf(stderr, "                                       Patterns and time will be given as shown:\n");
     fprintf(stderr, "                                           <pattern1> <time1> \n");
     fprintf(stderr, "                                           <pattern2> <time2>\n");
-    fprintf(stderr, "                                       where pattern is a hexadecimal value and time is an \n");
-    fprintf(stderr, "                                       unsigned int in ms. \n");
-    fprintf(stderr, "-p [pattern1, time1, pattern2 ...]     pattern mode: display each pattern for its respective time, \n");
-    fprintf(stderr, "                                       where pattern is a hexadecimal value and time is an\n");
+    fprintf(stderr, "                                       where pattern is a hexadecimal value and\n");
+    fprintf(stderr, "                                       time is an unsigned int in ms. \n");
+    fprintf(stderr, "-p [pattern1, time1, pattern2 ...]     pattern mode: display each pattern for\n");
+    fprintf(stderr, "                                       its respective time, where pattern is a\n");
+    fprintf(stderr, "                                       hexadecimal value and time is an");
     fprintf(stderr, "                                       unsigned int in ms. \n");
     fprintf(stderr, "                                       loop until exit command Ctrl-C is entered. \n");
-    fprintf(stderr, "                                       if odd number of arguments, print error message and exit. \n");
-    fprintf(stderr, "                                       MUST be enetered as last argument.\n");
+    fprintf(stderr, "                                       if odd number of arguments, print error message\n");
+    fprintf(stderr, "                                       and exit.MUST be enetered as last argument.\n");
     fprintf(stderr, "\n");
 }
 
@@ -42,10 +44,11 @@ int devmem_read (int r_to_read) {
     //Open the /dev/mem file, which is an image of the main system memory.
     //Using synchronous write operations (O_SYNC) to ensure that the value
     //is fully written to the underlying hardware before the write call returns
-    int fd = open("/dev/mem", O_RDWR | O_SYNC);
+    int fd = open("../../dev/mem", O_RDWR | O_SYNC);
     if (fd == -1)
     {
         fprintf(stderr, "failed to open /dev/mem. \n");
+        fprintf(stderr, "AAAAAAAAAAAAAAAAA");
         return 1;
     }
     
@@ -90,7 +93,7 @@ int main(int argc, char **argv)
     bool verbose;
     bool patternMode;
     bool fileMode;
-
+    int patternStartIndex = 0;
 
     if (argc == 1)
     {
@@ -106,9 +109,11 @@ int main(int argc, char **argv)
         switch(option){
             case 'h':
                 usage();
+                patternStartIndex++;
                 break;
             case 'v':
                 verbose = true;
+                patternStartIndex++;
                 break;
             case 'p':
                 patternMode = true;
@@ -119,7 +124,7 @@ int main(int argc, char **argv)
                 break;
             case '?':
                 printf("Unknown argument %c\n", optopt);
-                break;
+                return 1;
         }
         option = getopt(argc,argv,"hvpf");
         if(fileMode && patternMode){
