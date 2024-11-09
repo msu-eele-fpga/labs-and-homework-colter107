@@ -16,20 +16,22 @@ void usage()
     fprintf(stderr, "-v                                     verbose: print LED pattern displayed as a\n");
     fprintf(stderr, "                                       binary string, as well as how long each \n");
     fprintf(stderr, "                                       pattern is displayed\n");
-    fprintf(stderr, "                                       IE: LED pattern = 11110000 Display time = 500ms\n");
+    fprintf(stderr, "                                       IE: LED pattern = 11110000\n");
+    fprintf(stderr, "                                       Time = 500ms\n");
     fprintf(stderr, "-f [filename]                          file mode: reads from text file of given \n");
     fprintf(stderr, "                                       filename and writes the corresponding patterns.\n");
     fprintf(stderr, "                                       Patterns and time will be given as shown:\n");
     fprintf(stderr, "                                           <pattern1> <time1> \n");
     fprintf(stderr, "                                           <pattern2> <time2>\n");
-    fprintf(stderr, "                                       where pattern is a hexadecimal value and time is an \n");
-    fprintf(stderr, "                                       unsigned int in ms. \n");
-    fprintf(stderr, "-p [pattern1, time1, pattern2 ...]     pattern mode: display each pattern for its respective time, \n");
-    fprintf(stderr, "                                       where pattern is a hexadecimal value and time is an\n");
+    fprintf(stderr, "                                       where pattern is a hexadecimal value and\n");
+    fprintf(stderr, "                                       time is an unsigned int in ms. \n");
+    fprintf(stderr, "-p [pattern1, time1, pattern2 ...]     pattern mode: display each pattern for\n");
+    fprintf(stderr, "                                       its respective time, where pattern is a\n");
+    fprintf(stderr, "                                       hexadecimal value and time is an");
     fprintf(stderr, "                                       unsigned int in ms. \n");
     fprintf(stderr, "                                       loop until exit command Ctrl-C is entered. \n");
-    fprintf(stderr, "                                       if odd number of arguments, print error message and exit. \n");
-    fprintf(stderr, "                                       MUST be enetered as last argument.\n");
+    fprintf(stderr, "                                       if odd number of arguments, print error message\n");
+    fprintf(stderr, "                                       and exit.MUST be enetered as last argument.\n");
     fprintf(stderr, "\n");
 }
 
