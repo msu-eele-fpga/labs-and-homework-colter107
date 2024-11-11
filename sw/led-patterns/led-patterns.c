@@ -11,6 +11,9 @@
 #include <string.h>
 #include <signal.h>
 
+/**
+ * usage() - Prints usage info for led-patterns.c
+ */
 void usage()
 {
     fprintf(stderr, "usage: led-patterns [-h] [-v] [-p pattern1, time1, pattern2, time2 ...] [-f filename]\n");
@@ -39,6 +42,17 @@ void usage()
     fprintf(stderr, "\n");
 }
 
+/**
+ * devmem_read(char reg) - reads a register using /dev/mem
+ * @reg: Register to read from
+ * 
+ * This method is used to automatically add the appropriate offset and calculate the virtual address for devmem read. This was done
+ * so read operations can be simplified only passing in the register to read.
+ * This is based on devmem.c. Original comments from that file have been left for clarity when debugging.
+ * 
+ * Return: uint32_t VALUE
+ * This is the value that was read from the register
+ */
 int devmem_read(char reg){
     const size_t PAGE_SIZE = sysconf(_SC_PAGE_SIZE);
     uint32_t reg_offset = 4*reg;
@@ -88,6 +102,15 @@ int devmem_read(char reg){
     return(*target_virtual_addr);
 }   
 
+/**
+ * devmem_write(char reg, uint32_t write_value) - Write to a register using dev/mem.
+ * @reg: register to read from
+ * @write_value: value to write
+ * 
+ * This method is used to automatically add the appropriate offset and calculate the virtual address for devmem write. This was done
+ * so write operations can be simplified to passing 2 arguments. write_value MUST be a uint32_t, as the device has 32-bit registers.
+ * This is based on devmem.c. Original comments from that file have been left for clarity when debugging.
+ */
 int devmem_write(char reg, uint32_t write_value){
     const size_t PAGE_SIZE = sysconf(_SC_PAGE_SIZE);
     uint32_t reg_offset = 4*reg;
@@ -141,37 +164,63 @@ int devmem_write(char reg, uint32_t write_value){
     return 0;
 }
 
-void printBinary(int toBinary){
-    char* toPrint = malloc(8 * sizeof(char));
+/**
+ * print_binary(int to_binary) - Prints an int as its binary representation.
+ * @to_binary: Int to be converted and printed
+ * 
+ * Printing to console was chosen instead of returning the string here so that the memory can be allocated and freed in the same
+ * function. For the purpose of this program, the result never needs to be stored.
+ */
+void print_binary(int to_binary){
+    char* string_to_print = malloc(8 * sizeof(char));
     for(int i = 6; i>=0; i--){
-        if(toBinary % 2 == 0){
-           toPrint[i] = '0';
+        if(to_binary % 2 == 0){
+           string_to_print[i] = '0';
         } else {
-            toPrint[i] = '1';
+            string_to_print[i] = '1';
         }
-        toBinary >>= 1;
+        to_binary >>= 1;
     }
-    toPrint[7] = '\0';
-    printf("%s", toPrint);
-    free (toPrint);
+    string_to_print[7] = '\0';
+    printf("%s", string_to_print);
+    free (string_to_print);
 }
 
-static volatile bool loopPatterns = true;
+static volatile bool loop_patterns = true;
 
-void intHandler(int dummy){
-    loopPatterns = false;
+/**
+ * int_handler(int dummy) - handler for ctrl+c interrupt
+ * @dummy: information from signal handler. Required by the signal, but not used in this function.
+ * 
+ * Stops the patterns from looping in pattern mode and closes the program
+ */
+void int_handler(int dummy){
+    loop_patterns = false;
     devmem_write(0,0);
 }
     
-
+/**
+ * main(int argc, char **argv) - main functionality of led-patterns
+ * 
+ * @argc: command line argument count
+ * @argv: command line arguments
+ * 
+ * Writes patterns to the DE10-Nano's LEDs while it is running the led-patterns .rbf file. 
+ * Type "./led-patterns -h" for in-depth usage information.
+ * 
+ * Return: Exit code. Returns 0 if successful exit, 1 if error
+ */
 int main(int argc, char **argv)
 {   
+    //Command line arguments 
     int option;
     bool verbose = false;
-    bool patternMode = false;
-    bool fileMode = false;
-    char fileName[100] = "";
-    int patternStartIndex = 2;
+    bool pattern_mode = false;
+    bool file_mode = false;
+    char file_name[100] = "";
+
+    //Start index for led pattern data if -p is used
+    int pattern_start_index = 2;
 
     if (argc == 1)
     {
@@ -182,95 +231,122 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    while((option = getopt(argc,argv,"hvp:f:")) != -1){
-        switch(option){
+    //Get CLI's to set appropriate mode
+    while((option = getopt(argc,argv,"hvp:f:")) != -1)
+    {
+        switch(option)
+        {
             case 'h':
                 usage();
-                patternStartIndex++;
+                pattern_start_index++;
                 break;
+
             case 'v':
                 verbose = true;
-                patternStartIndex++;
+                pattern_start_index++;
                 break;
+
             case 'p':
-                patternMode = true;
+                pattern_mode = true;
                 break;
+
             case 'f':
-                fileMode = true;
-                
-                if (optarg != NULL) {
-                    strcpy(fileName,optarg);
-                } else {
+                file_mode = true;
+                if (optarg != NULL) 
+                {
+                    strcpy(file_name,optarg);
+                } 
+                else 
+                {
                     printf("Missing File Name\n");
                     printf("Exiting program...\n");
                     return 1;
                 }
+
                 break;
             case '?':
                 printf("Unknown argument %c\n", optopt);
+                usage();
                 printf("Exiting program... \n");
                 return 1;
         }
         
 
-        if(fileMode && patternMode){
+        if(file_mode && pattern_mode)
+        {
             printf("ERROR: both file mode and pattern mode given\n");
             printf("Exiting program... \n");
             return 1;
         }
-
     }
-
-    if(patternMode){
-        
+    //Pattern mode functionality
+    if(pattern_mode)
+    {  
+        //Set to hardware control mode
         devmem_write(0,0x1);
-        if((argc - patternStartIndex) % 2 != 0){
+        //Handle if odd number of pattern arguments
+        if((argc - pattern_start_index) % 2 != 0)
+        {
             printf("Error: Each pattern was not given a matching time value\n");
             printf("Exiting program... \n");
             return 1;
         } 
-
-        signal(SIGINT, intHandler);
-        while(loopPatterns == true){
-            for(int i = patternStartIndex; i < argc; i++){
-                uint32_t patternToWrite = strtoul(argv[i], NULL, 0);
-                if(verbose){
+        signal(SIGINT, int_handler);
+        //Read and loop patterns until ctrl+c
+        while(loop_patterns == true)
+        {
+            for(int i = pattern_start_index; i < argc; i++)
+            {
+                uint32_t pattern_to_write = strtoul(argv[i], NULL, 0);
+                if(verbose)
+                {
                     printf("LED Pattern = ");
-                    printBinary(patternToWrite);
+                    print_binary(pattern_to_write);
                 }
-                devmem_write(2, patternToWrite);
+                devmem_write(2, pattern_to_write);
                 i++;
-                int sleepTimeS = strtoul(argv[i], NULL, 0);
-                float sleepTimeMs = (float)sleepTimeS/1000;
-                if(verbose){
-                    printf(" Time: %d ms\n",sleepTimeS);
+                int sleep_time_s = strtoul(argv[i], NULL, 0);
+                float sleep_time_ms = (float)sleep_time_s/1000;
+                if(verbose)
+                {
+                    printf(" Time: %d ms\n",sleep_time_s);
                 }
-                sleep(sleepTimeMs);
+                sleep(sleep_time_ms);
             }
         }
-    } else if (fileMode) {
-        FILE* fin = fopen(fileName, "r");
-        if(fin == NULL){
-            printf("ERROR: file \"%s\" not found\n", fileName);
+    } 
+    //File mode functionality
+    else if (file_mode)
+    {
+        //Try to read file
+        FILE* fin = fopen(file_name, "r");
+        if(fin == NULL)
+        {
+            printf("ERROR: file \"%s\" not found\n", file_name);
             return 0;
-        } else {
+        }
+        //If successful, read patterns in file, write to LEDs
+        else 
+        {
             char line[256];
-            while(fgets(line,sizeof(line),fin)){
-                uint32_t patternToWrite = strtoul(strtok(line," "), NULL, 0);
-                if(verbose){
+            while(fgets(line,sizeof(line),fin))
+            {
+                uint32_t pattern_to_write = strtoul(strtok(line," "), NULL, 0);
+                if(verbose)
+                {
                     printf("LED Pattern = ");
-                    printBinary(patternToWrite);
+                    print_binary(pattern_to_write);
                 }
-                devmem_write(2, patternToWrite);
-                uint32_t sleepTimeS = strtoul(strtok(NULL,"\n"), NULL, 0);
-                float sleepTimeMs = (float)sleepTimeS/1000;
-                if(verbose){
-                    printf(" Time: %d ms\n",sleepTimeS);
+                devmem_write(2, pattern_to_write);
+                uint32_t sleep_time_s = strtoul(strtok(NULL,"\n"), NULL, 0);
+                float sleep_time_ms = (float)sleep_time_s/1000;
+                if(verbose)
+                {
+                    printf(" Time: %d ms\n",sleep_time_s);
                 }
-                sleep(sleepTimeMs);
+                sleep(sleep_time_ms);
             }
             fclose(fin);
         }
-    }
-    
+    } 
 }
