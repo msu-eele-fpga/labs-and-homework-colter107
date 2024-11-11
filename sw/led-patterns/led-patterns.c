@@ -160,15 +160,17 @@ static volatile bool loopPatterns = true;
 
 void intHandler(int dummy){
     loopPatterns = false;
+    devmem_write(0,0);
 }
     
 
 int main(int argc, char **argv)
 {   
     int option;
-    bool verbose;
+    bool verbose = false;
     bool patternMode = false;
     bool fileMode = false;
+    char fileName[100] = "";
     int patternStartIndex = 2;
 
     if (argc == 1)
@@ -180,8 +182,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    option = getopt(argc,argv,"hvpf:");
-    while(option != -1){
+    while((option = getopt(argc,argv,"hvp:f:")) != -1){
         switch(option){
             case 'h':
                 usage();
@@ -196,7 +197,14 @@ int main(int argc, char **argv)
                 break;
             case 'f':
                 fileMode = true;
-                printf("FILEAAAA");
+                
+                if (optarg != NULL) {
+                    strcpy(fileName,optarg);
+                } else {
+                    printf("Missing File Name\n");
+                    printf("Exiting program...\n");
+                    return 1;
+                }
                 break;
             case '?':
                 printf("Unknown argument %c\n", optopt);
@@ -211,7 +219,6 @@ int main(int argc, char **argv)
             return 1;
         }
 
-        option = getopt(argc,argv,"hvpf");
     }
 
     if(patternMode){
@@ -234,12 +241,36 @@ int main(int argc, char **argv)
                 devmem_write(2, patternToWrite);
                 i++;
                 int sleepTimeS = strtoul(argv[i], NULL, 0);
-                float toSleep = (float)sleepTimeS/1000;
+                float sleepTimeMs = (float)sleepTimeS/1000;
                 if(verbose){
                     printf(" Time: %d ms\n",sleepTimeS);
                 }
-                sleep(toSleep);
+                sleep(sleepTimeMs);
             }
         }
+    } else if (fileMode) {
+        FILE* fin = fopen(fileName, "r");
+        if(fin == NULL){
+            printf("ERROR: file \"%s\" not found\n", fileName);
+            return 0;
+        } else {
+            char line[256];
+            while(fgets(line,sizeof(line),fin)){
+                uint32_t patternToWrite = strtoul(strtok(line," "), NULL, 0);
+                if(verbose){
+                    printf("LED Pattern = ");
+                    printBinary(patternToWrite);
+                }
+                devmem_write(2, patternToWrite);
+                uint32_t sleepTimeS = strtoul(strtok(NULL,"\n"), NULL, 0);
+                float sleepTimeMs = (float)sleepTimeS/1000;
+                if(verbose){
+                    printf(" Time: %d ms\n",sleepTimeS);
+                }
+                sleep(sleepTimeMs);
+            }
+            fclose(fin);
+        }
     }
+    
 }
