@@ -2,10 +2,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <sys/mman.h> //for map
 #include <fcntl.h> //for file open flags
 #include <getopt.h>
 #include <unistd.h> //for getting the page size
+#include <math.h>
+#include <string.h>
+#include <signal.h>
 
 void usage()
 {
@@ -137,15 +141,35 @@ int devmem_write(char reg, uint32_t write_value){
     return 0;
 }
 
+void printBinary(int toBinary){
+    char* toPrint = malloc(8 * sizeof(char));
+    for(int i = 6; i>=0; i--){
+        if(toBinary % 2 == 0){
+           toPrint[i] = '0';
+        } else {
+            toPrint[i] = '1';
+        }
+        toBinary >>= 1;
+    }
+    toPrint[7] = '\0';
+    printf("%s", toPrint);
+    free (toPrint);
+}
+
+static volatile bool loopPatterns = true;
+
+void intHandler(int dummy){
+    loopPatterns = false;
+}
+    
+
 int main(int argc, char **argv)
 {   
     int option;
     bool verbose;
-    bool patternMode;
-    bool fileMode;
-    int patternStartIndex = 1;
-    int* patterns;
-    int* times;
+    bool patternMode = false;
+    bool fileMode = false;
+    int patternStartIndex = 2;
 
     if (argc == 1)
     {
@@ -171,22 +195,51 @@ int main(int argc, char **argv)
                 patternMode = true;
                 break;
             case 'f':
-                printf("File\n");
                 fileMode = true;
+                printf("FILEAAAA");
                 break;
             case '?':
                 printf("Unknown argument %c\n", optopt);
+                printf("Exiting program... \n");
                 return 1;
         }
-        option = getopt(argc,argv,"hvpf");
+        
+
         if(fileMode && patternMode){
             printf("ERROR: both file mode and pattern mode given\n");
             printf("Exiting program... \n");
             return 1;
         }
-        
 
-
+        option = getopt(argc,argv,"hvpf");
     }
 
+    if(patternMode){
+        
+        devmem_write(0,0x1);
+        if((argc - patternStartIndex) % 2 != 0){
+            printf("Error: Each pattern was not given a matching time value\n");
+            printf("Exiting program... \n");
+            return 1;
+        } 
+
+        signal(SIGINT, intHandler);
+        while(loopPatterns == true){
+            for(int i = patternStartIndex; i < argc; i++){
+                uint32_t patternToWrite = strtoul(argv[i], NULL, 0);
+                if(verbose){
+                    printf("LED Pattern = ");
+                    printBinary(patternToWrite);
+                }
+                devmem_write(2, patternToWrite);
+                i++;
+                int sleepTimeS = strtoul(argv[i], NULL, 0);
+                float toSleep = (float)sleepTimeS/1000;
+                if(verbose){
+                    printf(" Time: %d ms\n",sleepTimeS);
+                }
+                sleep(toSleep);
+            }
+        }
+    }
 }
