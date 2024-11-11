@@ -239,7 +239,7 @@ int main(int argc, char **argv)
             case 'h':
                 usage();
                 pattern_start_index++;
-                break;
+                return 0;
 
             case 'v':
                 verbose = true;
