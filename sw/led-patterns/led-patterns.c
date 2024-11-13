@@ -328,6 +328,7 @@ int main(int argc, char **argv)
         //If successful, read patterns in file, write to LEDs
         else 
         {
+            devmem_write(0,0x1);
             char line[256];
             while(fgets(line,sizeof(line),fin))
             {
