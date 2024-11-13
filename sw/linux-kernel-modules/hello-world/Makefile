@@ -6,10 +6,10 @@ else
 # normal makefile
 
 # path to kernel directory
-KDIR ?= /lib/modules/`uname -r`/build
+KDIR ?= ~/Desktop/linux-socfpga
 
 default:
-	$(MAKE) -C $(KDIR) M=$$PWD
+	$(MAKE) -C $(KDIR) ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- M=$$PWD
 clean:
 	$(MAKE) -C $(KDIR) M=$$PWD clean
 endif
