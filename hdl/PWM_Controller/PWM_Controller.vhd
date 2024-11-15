@@ -83,6 +83,7 @@ signal duty_cycle_clk_cycles_full : unsigned(duty_cycle_clock_cycles_num_bits_to
 --Number of whole clock cycles in one base period
 --No fractional bits :D
 signal duty_cycle_clk_cycles : unsigned(duty_cycle_clock_cycles_num_bits_whole - 1 downto 0);
+signal duty_cycle_clk_cycles_constrained : unsigned(duty_cycle_clock_cycles_num_bits_whole - 1 downto 0) := (others => '0');
 
 signal counter : unsigned (PERIOD_WIDTH downto 0) := (others => '0');
 signal pwm : STD_ULOGIC := '0';
@@ -98,10 +99,19 @@ period_clk_cycles <= period_clk_cycles_full(period_clock_cycles_num_bits_total -
 duty_cycle_clk_cycles_full <= period_clk_cycles_full * duty_cycle;
 duty_cycle_clk_cycles <= duty_cycle_clk_cycles_full(duty_cycle_clock_cycles_num_bits_total - 1 downto PERIOD_FRACTIONAL + DUTY_CYCLE_FRACTIONAL);
 
-pulse_on : process(clk,rst)
+
+pulse_width_modulate : process(clk,rst)
 begin
     if(rst = '1') then
         counter <= (others => '0');
+        if(duty_cycle_clk_cycles > period_clk_cycles) then
+            duty_cycle_clk_cycles_constrained <= (others => '0');
+            duty_cycle_clk_cycles_constrained(duty_cycle_clock_cycles_num_bits_whole-1) <= '1';
+        elsif(to_integer(duty_cycle_clk_cycles) < 0) then
+            duty_cycle_clk_cycles_constrained <= (others => '0');
+        else
+            duty_cycle_clk_cycles_constrained <= duty_cycle_clk_cycles;
+        end if;
     elsif(rising_edge(clk))then
         counter <= counter + 1;
         --If counter reaches period, turn on PWM signal, reset timer
@@ -109,7 +119,7 @@ begin
             pwm <= '1';
             counter <= (others => '0');
         --If counter is between end of duty cycle and period, turn off PWM signal
-        elsif counter >= duty_cycle_clk_cycles  then
+        elsif counter >= duty_cycle_clk_cycles_constrained  then
             pwm <= '0';
         --Otherwise, the counter is between the start of the period and the end of duty cycle, and PWM should be on
         else
@@ -117,5 +127,5 @@ begin
         end if;
         output <= pwm;
     end if;
-end process pulse_on;
+end process pulse_width_modulate;
 end architecture;
