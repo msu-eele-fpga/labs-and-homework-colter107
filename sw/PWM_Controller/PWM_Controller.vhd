@@ -82,6 +82,17 @@ period_clk_cycles <= period_clk_cycles_full(period_clock_cycles_num_bits_total -
 duty_cycle_clk_cycles_full <= period_clk_cycles_full * duty_cycle;
 duty_cycle_clk_cycles <= period_clk_cycles_full(duty_cycle_clock_cycles_num_bits_total - 1 downto (PERIOD_FRACTIONAL + DUTY_CYCLE_FRACTIONAL));
 
+adjust_range: process(duty_cycle_clk_cycles)
+begin
+    if (to_integer(duty_cycle_clk_cycles) > 1) then
+        duty_cycle_clk_cycles <= period_clk_cycles;
+    elsif (to_integer(duty_cycle_clk_cycles) <= 0) then 
+        duty_cycle_clk_cycles <= (others => '0');
+    else
+        duty_cycle_clk_cycles <= duty_cycle_clk_cycles;
+    end if;
+end process adjust_range;
+    
 pulse_on : process(clk,rst)
 begin
     if(rst = '1') then
