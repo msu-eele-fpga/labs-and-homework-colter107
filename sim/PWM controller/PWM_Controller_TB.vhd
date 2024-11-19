@@ -18,7 +18,7 @@ architecture testbench of PWM_controller_TB is
 --                                                           wwwwwwfffffffffffffffffffff
     signal period_tb_2          : unsigned (26 downto 0) := "000000000100000000000000000"; --62.5 us
 --                                                           wffffffffffffff
-    signal duty_cycle_tb_2      : unsigned (14 downto 0) := "011111100000000"; --Close to full
+    signal duty_cycle_tb_2      : unsigned (14 downto 0) := "011111100000000"; --98.4%
 --                                                           wwwwwwfffffffffffffffffffff
     signal period_tb_3          : unsigned (26 downto 0) := "000001000000000000000000000"; --1 ms
 --                                                           wffffffffffffff
