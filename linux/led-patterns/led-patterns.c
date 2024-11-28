@@ -10,6 +10,7 @@
 #define HPS_LED_CONTROL_OFFSET 0x0
 #define BASE_PERIOD_OFFSET 0x4
 #define LED_REG_OFFSET 0x8
+#define SPAN 0x10
 
 
 /**
