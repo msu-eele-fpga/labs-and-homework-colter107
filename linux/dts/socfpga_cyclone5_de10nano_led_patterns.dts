@@ -10,4 +10,9 @@
             linux,default-trigger = "heartbeat";
         };
     };
+
+    led_patterns: led_patterns@ff200000 {
+        compatible = "girardot,led_patterns";
+        reg = <0xff200000 16>;
+    };
 };
