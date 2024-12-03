@@ -19,7 +19,7 @@ The probe function is called when a device is found by the driver, and typically
 
 > How does your driver know what memory addresses are associated with your device?
 
-In the probe function, the code requests the device's memory region, and remaps it to virtual addresses in the kernel's virtual address space. This means that the kernel now has virtual addresses it can modify which will be reflected to the device's physical memory.
+In the probe function, the code requests the device's memory region, and remaps it to virtual addresses in the kernel's virtual address space. This means that the kernel now has virtual addresses it can modify which will be reflected to the device's physical memory. These addresses are then stored in the state container.
 
 > What are the two ways we can write to our device’s registers? In other words, what subsystems do
 we use to write to our registers?
@@ -28,5 +28,5 @@ We use the misc subsystem under the character driver and sysfs/device attributes
  
 > What is the purpose of our struct led_patterns_dev state container?
 
-The state container keeps track of what state our device is in. It stores things like the addresses of registers, the values of those registers, and anything else the device should track while it is running. It is created separately for each device (to allow multiple devices to run at once) and is passed to any function that needs to read or change the state of the device.
+The state container keeps track of what state our device is in. It stores things like the addresses of registers and anything else the device should track while it is running. It is created separately for each device (to allow multiple devices to run at once) and is passed to any function that needs to read or change the state of the device.
 

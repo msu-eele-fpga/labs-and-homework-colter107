@@ -33,11 +33,12 @@ struct led_patterns_dev {
     struct mutex lock;
 };
 
+
 /**
  * led_reg_show() - Return led_reg value to user-space via sysfs.
  * @dev: Device structure for led_patterns component.
  *       this device struct is embedded in the led_patterns's
- *         device sturct
+ *       device struct
  * @attr: unused
  * @buf: Buffer that gets reterned to user space
  * 
@@ -54,13 +55,14 @@ static ssize_t led_reg_show(struct device *dev,
     return scnprintf(buf, PAGE_SIZE, "%u\n", led_reg);
 }
 
+
 /**
  * led_reg_store() - Store for the led_reg value.
  *  @dev: Device structure for led_patterns component. This 
  *        device struct is embedded in the led_patterns'
  *        platform device struct.
  *  @attr: unused
- *  @buf: Buffer that contains the led_reg balue being written
+ *  @buf: Buffer that contains the led_reg value being written
  *  @size:  The number of bytes stored
  * 
  *  Return: number of bytes stored
@@ -83,13 +85,14 @@ static ssize_t led_reg_store(struct device *dev,
 
     //Write was successful, so return number of bytes written
     return size;
-}   
+}  
+
 
 /**
  * hps_led_control_show() - Return hps_led_control value to user-space via sysfs.
  * @dev: Device structure for led_patterns component.
  *       this device struct is embedded in the led_patterns's
- *         device sturct
+ *       device struct
  * @attr: unused
  * @buf: Buffer that gets reterned to user space
  * 
@@ -107,13 +110,14 @@ static ssize_t hps_led_control_show(struct device *dev,
     return scnprintf(buf, PAGE_SIZE, "%u\n", hps_control);
 }
 
+
 /**
- * hps_led_control_store() - Store for the led_reg value.
+ * hps_led_control_store() - Store for the hps_led_control value.
  *  @dev: Device structure for led_patterns component. This 
  *        device struct is embedded in the led_patterns'
  *        platform device struct.
  *  @attr: unused
- *  @buf: Buffer that contains the led_reg balue being written
+ *  @buf: Buffer that contains the hps_led_control value being written
  *  @size:  The number of bytes stored
  * 
  *  Return: number of bytes stored
@@ -138,11 +142,12 @@ static ssize_t hps_led_control_store(struct device *dev,
     return size;
 }
 
+
 /**
  * base_period_show() - Return base_period value to user-space via sysfs.
  * @dev: Device structure for led_patterns component.
  *       this device struct is embedded in the led_patterns's
- *         device sturct
+ *       device struct
  * @attr: unused
  * @buf: Buffer that gets reterned to user space
  * 
@@ -160,13 +165,14 @@ static ssize_t base_period_show(struct device *dev,
     return scnprintf(buf, PAGE_SIZE, "%u\n", base_period);
 }
 
+
 /**
- * base_period_store() - Store for the led_reg value.
+ * base_period_store() - Store for the base_period value.
  *  @dev: Device structure for led_patterns component. This 
  *        device struct is embedded in the led_patterns'
  *        platform device struct.
  *  @attr: unused
- *  @buf: Buffer that contains the led_reg balue being written
+ *  @buf: Buffer that contains the base_period value being written
  *  @size:  The number of bytes stored
  * 
  *  Return: number of bytes stored
@@ -206,12 +212,11 @@ static struct attribute *led_patterns_attrs[] = {
 ATTRIBUTE_GROUPS(led_patterns);
 
 
-
 /**
  * led_patterns_read() - Read method for led_patterns char device
  * @file: Pointer to the char device file struct.
  * @buf: User-space buffer to read the value into.
- * @count: number of bytes being requested.
+ * @count: Number of bytes being requested.
  * @offset: Byte offset in the file being read from.
  * 
  * Return: On success, the number of bytes written is returned and the
@@ -326,7 +331,7 @@ static ssize_t led_patterns_write(struct file *file, const char __user *buf, siz
 
 /**
  * led_patterns_fops - File operations supported by the 
- *                          led_patterns driver
+ *                     led_patterns driver
  * @owner: The led_patterns driver owns the file operations.
  *         Ensures the driver can't be removed while character
  *         device is in use.
@@ -342,13 +347,13 @@ static const struct file_operations led_patterns_fops = {
     .llseek = default_llseek,
 };
 
+
 /**
  * led_patterns_probe() - When match found, initialize
  * @pdev: platform device associated with led patterns device
  *        automatically crated by the driver core from 
  *        led patterns device tree node
  */
-
 static int led_patterns_probe(struct platform_device *pdev)
 {
     struct led_patterns_dev *priv;
@@ -415,6 +420,7 @@ static int led_patterns_probe(struct platform_device *pdev)
     return 0;
 }
 
+
 /**
  * led_patterns_remove() - Remove led patterns device.
  * @pdev: Platform device structure associated with led patterns device
@@ -437,6 +443,7 @@ static int led_patterns_remove(struct platform_device *pdev)
     return 0;
 }
 
+
 /*
  * Define compatible property to match devices to this driver,
  * then add device ID structure to kernel's table. For a device
@@ -447,6 +454,7 @@ static const struct of_device_id led_patterns_of_match[] = {
     { .compatible = "girardot,led_patterns", },
     { }
 };
+
 
 /** 
  * struct led_patterns_driver - Platform driver struct for the led-patterns driver
@@ -466,6 +474,7 @@ static struct platform_driver led_patterns_driver = {
         .dev_groups = led_patterns_groups,
     },
 };
+
 
 // NOTE: macro automatically handles init/exit
 module_platform_driver(led_patterns_driver);
