@@ -4,20 +4,34 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
+#include <signal.h>
 
 // TODO: update these offsets if your address are different
 #define HPS_LED_CONTROL_OFFSET 0x0
 #define BASE_PERIOD_OFFSET 0x4
 #define LED_REG_OFFSET 0x08
-
+static volatile bool loop_patterns = true;
+/**
+ * int_handler(int dummy) - handler for ctrl+c interrupt
+ * @dummy: information from signal handler. Required by the signal, but not used in this function.
+ * 
+ * Stops the patterns from looping in pattern mode and closes the program
+ */
+void int_handler(int dummy){
+	printf("Quitting...\n");
+    loop_patterns = false;
+}
+    
 int main () {
 	FILE *file;
 	size_t ret;	
 	uint32_t val;
 
+
 	file = fopen("/dev/led_patterns" , "rb+" );
 	if (file == NULL) {
-		printf("failed to open file\n");
+		printf("\nfailed to open file\n");
 		exit(1);
 	}
 
@@ -118,6 +132,135 @@ int main () {
 	ret = fread(&val, 4, 1, file);
 	printf("LED_reg = 0x%x\n", val);
 
+
+	printf("writing pattern 4 to LEDs....\n");
+
+	// Turn on software-control mode
+	val = 0x01;
+    ret = fseek(file, HPS_LED_CONTROL_OFFSET, SEEK_SET);
+	ret = fwrite(&val, 4, 1, file);
+	// We need to "flush" so the OS finishes writing to the file before our code continues.
+	fflush(file);
+
+	signal(SIGINT, int_handler);
+
+	while(loop_patterns){
+		// Write pattern 4 to the LEDs
+		val = 0x01;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x03;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x07;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x0F;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x1F;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x3F;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x7F;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x7E;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x7C;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x78;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x70;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x60;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x40;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+		val = 0x00;
+		ret = fseek(file, LED_REG_OFFSET, SEEK_SET);
+		ret = fwrite(&val, 4, 1, file);
+		fflush(file);
+
+		usleep(0.5e6);
+
+	}
+
+	// Turn on hardware-control mode
+	printf("back to hardware-control mode....\n");
+	val = 0x00;
+    ret = fseek(file, HPS_LED_CONTROL_OFFSET, SEEK_SET);
+	ret = fwrite(&val, 4, 1, file);
+	fflush(file);
+
+	val = 0x12;
+    ret = fseek(file, BASE_PERIOD_OFFSET, SEEK_SET);
+	ret = fwrite(&val, 4, 1, file);
+	fflush(file);
+
+	sleep(5);
+
 	fclose(file);
+
 	return 0;
 }
